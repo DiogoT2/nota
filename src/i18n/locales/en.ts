@@ -1,0 +1,120 @@
+import type { Dictionary } from './pt-PT';
+
+export const en: Dictionary = {
+  brand: {
+    name: 'Nota',
+    handle: 'nota.app/{{handle}}',
+  },
+  tabs: {
+    circle: 'Circle',
+    search: 'Search',
+    ranking: 'Ranking',
+    me: 'Me',
+  },
+  common: {
+    back: '← {{destination}}',
+    or: 'or',
+    delta: 'Δ {{value}}',
+    blindScore: '—.—',
+    noScore: '—',
+    seasonShort: 'S{{number}}',
+    episodeShort: 'E{{number}}',
+  },
+  feed: {
+    title: 'The Circle',
+    entries: '{{count}} entries',
+    blindPrompt: 'Rate it to see his',
+    blindPromptFeminine: 'Rate it to see hers',
+    endTitle: 'End',
+    endBody:
+      "You've seen everything the {{count}} people in your Circle posted. There is nothing below this.",
+  },
+  title: {
+    myScore: 'My score',
+    derivedFrom: 'Derived from {{count}} comparisons. Tap to reorder.',
+    rankPosition: '#{{position}} in your ranking',
+    circle: 'The Circle',
+    sortedByDistance: 'By distance from mine',
+    reply: 'Reply',
+    disagree: 'Disagree',
+    replyLimit: 'Replies up to {{count}} characters. No comment threads.',
+  },
+  series: {
+    seasons: '{{count}} seasons',
+    averageOfMyScores: 'Average of your scores',
+    season: 'Season {{number}}',
+    legendMine: 'Me',
+    legendCircle: 'Circle',
+    unseenHidden: '{{count}} episodes you have not seen, hidden',
+    unseenVisible: '{{count}} episodes you have not seen, visible',
+    show: 'Show',
+    hide: 'Hide',
+    biggestDisagreement: 'Biggest disagreement of the season',
+  },
+  rate: {
+    stepOf: 'Step {{current}} of {{total}}',
+    exit: 'Exit',
+    bucketQuestion: 'Before you see anything else: how did it leave you?',
+    bucketLoved: 'Loved it',
+    bucketLovedHint: 'stayed with me for days',
+    bucketLiked: 'Liked it',
+    bucketLikedHint: 'well worth it',
+    bucketMeh: 'Nah',
+    bucketMehHint: 'not for me',
+    bucketAbandoned: 'Gave up halfway',
+    bucketFootnote:
+      'The bucket sets the range. The comparisons set the number — which you never write.',
+    bucketChosen: '{{bucket}} → next, {{count}} comparisons inside this bucket.',
+    progress: '{{current}} of {{total}}',
+    compareQuestion: 'Which did you like more?',
+    skip: "Don't know",
+    compareFootnote: 'Each answer halves the list. Never more than {{count}}.',
+    placedLabel: 'Placed',
+    placedBody:
+      'It landed at #{{position}} of {{total}}, between {{above}} and {{below}}. {{revealed}} scores from your Circle became visible.',
+    seeDisagreement: 'See who disagrees',
+    restart: 'Run the sequence again',
+  },
+  profile: {
+    viewedByStranger: 'Seen by a stranger',
+    viewedByFollower: 'Seen by a follower',
+    viewedByCircle: 'Seen by someone in the Circle',
+    follow: 'Follow',
+    requested: 'Request sent',
+    top: 'Top {{count}}',
+    personalRanking: 'Personal ranking',
+    rankingClosed: "{{name}}'s ranking opens to the people {{pronoun}} follows back.",
+    pronounShe: 'she',
+    pronounHe: 'he',
+    pronounThey: 'they',
+    whereYouDisagree: 'Where you disagree',
+    circleFootnote:
+      'You also see their episode-by-episode scores and can reply in {{count}} characters.',
+  },
+  pending: {
+    label: 'Not yet',
+    search:
+      'Search arrives in phase 2: TMDB is queried on the server, cached, and never from here.',
+  },
+  me: {
+    heading: 'Me',
+    seeProfileAs: 'See my profile as',
+    asStranger: 'A stranger',
+    asFollower: 'A follower',
+    asCircle: 'Someone in the Circle',
+    shareCard: 'Share card',
+  },
+  ranking: {
+    titles: '{{count}} titles',
+    heading: 'My ranking',
+    instructions:
+      'Drag to correct it. Every drag rewrites the scores around it — the number follows the order, not the other way round.',
+    filters: 'Show only: films · series · {{year}} · watched with the Circle',
+  },
+  placeholder: {
+    building: 'Under construction. See docs/plano/fase-0-1.md.',
+  },
+  share: {
+    rankedBy: '#{{position}} in the ranking of',
+  },
+};

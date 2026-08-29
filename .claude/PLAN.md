@@ -1,0 +1,271 @@
+# Nota — Plano de execução
+
+Documento de trabalho partilhado. Cada agente marca as suas próprias caixas ao concluir uma tarefa, e **só** as suas.
+
+## Protocolo
+
+- `[ ]` por fazer · `[x]` feito · `[~]` em curso · `[!]` bloqueado (acrescenta o porquê na linha)
+- Uma tarefa só é marcada quando o critério de aceitação da secção está cumprido, não quando o código compila.
+- Uma fase só fecha com **todas** as caixas marcadas, veredicto positivo do `rls-adversary` e assinatura do `tech-lead` no fim da secção.
+- Ninguém começa a fase N+1 antes de a fase N estar fechada.
+- Quem descobrir trabalho em falta acrescenta a linha em vez de a fazer em silêncio.
+
+## Regras que nenhuma fase pode violar
+
+1. Nota cega — ninguém vê notas de terceiros sem ter dado a sua.
+2. Perfis privados por omissão; seguir é unidireccional.
+3. Círculo mútuo, máximo 30. Discordância, taste match, respostas e notas de episódio são exclusivos do Círculo.
+4. A nota é derivada de um ranking, nunca escrita pelo utilizador.
+5. As regras 1 a 3 vivem em RLS. Nunca em lógica de cliente.
+
+---
+
+## Fase 0 — Fundações
+
+Responsável: `tech-lead`
+
+- [ ] Repositório criado, TypeScript em modo estrito, lint e formatação a correr em pre-commit
+- [ ] Projeto Expo a arrancar em iOS e Android
+- [ ] Projeto Supabase local com `supabase start` e seed reproduzível
+- [ ] CI: lint, typecheck, testes unitários, testes pgTAP
+- [ ] Segredos em `.env` local e no CI; `.env` no gitignore; verificação automática de que nada sensível entra no bundle
+- [ ] `docs/adr/0001-stack.md` escrito
+- [ ] Ambientes separados: local, staging, produção
+
+**Aceitação:** um programador novo clona, corre um comando e tem tudo a funcionar.
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Fase 1 — Esquema e RLS
+
+Responsável: `db-architect` · Veto: `rls-adversary`
+
+### Esquema
+
+- [ ] `profiles` com `is_private` a `true` por omissão
+- [ ] `follows` com estado `pending | active`
+- [ ] `circle_members` com trigger que garante reciprocidade
+- [ ] Limite de 30 no Círculo imposto por constraint ou trigger, à prova de escrita concorrente
+- [ ] `blocks`
+- [ ] `reports`
+- [ ] `titles`, `seasons`, `episodes` (cache TMDB)
+- [ ] `buckets`
+- [ ] `rank_positions` com unicidade por `(user_id, subject_type, scope_id)` e numeração esparsa ou fraccionária
+- [ ] `watched`
+- [ ] `reactions`, `replies` com limite de 140 caracteres em constraint
+- [ ] `taste_match`
+- [ ] Nota derivada exposta por vista ou função — nenhuma coluna de nota no caminho de escrita
+- [ ] Índices para: feed do Círculo, ranking por âmbito, pesquisa de handle
+- [ ] Todas as migrações reversíveis
+
+### RLS
+
+- [ ] RLS activo em todas as tabelas com dados de utilizador, sem excepções
+- [ ] Ler notas de um título exige bucket próprio para esse título
+- [ ] Ler qualquer coisa de perfil privado exige `follows.state = 'active'`
+- [ ] Ler notas de episódio exige Círculo **e** `watched` para esse episódio
+- [ ] Bloqueio anula tudo o acima, nos dois sentidos
+- [ ] Escrita restrita ao próprio `user_id` em todas as tabelas
+- [ ] Cada `security definer` justificado num ADR
+
+### Ataque
+
+Responsável: `rls-adversary`
+
+- [ ] Ler bucket ou posição alheia sem ter avaliado
+- [ ] Inferir nota alheia por `count=exact`, ordenação ou mensagens de erro distintas
+- [ ] Avaliar, ler o alvo, apagar a avaliação, voltar a ler
+- [ ] Ler perfil privado com follow em `pending`
+- [ ] Ler perfil privado por tabela de junção (reactions, replies, taste_match)
+- [ ] Ler notas de episódio fora do Círculo
+- [ ] Ler notas de episódio de um episódio não visto
+- [ ] Auto-inserção em `circle_members` sem reciprocidade
+- [ ] Ultrapassar o limite de 30 com duas escritas em simultâneo
+- [ ] Depois de bloqueado: feed, pesquisa, perfil, respostas antigas, taste match
+- [ ] Escrever em nome de outro `user_id`
+- [ ] Responder a conteúdo fora do Círculo
+- [ ] Exceder 140 caracteres por chamada directa
+- [ ] Relatório escrito com veredicto global
+
+**Aceitação:** todos os ataques falham. Uma única falha bloqueia a fase.
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Fase 2 — TMDB
+
+Responsável: `tmdb-integrator`
+
+- [ ] Edge Function `search` — filmes e séries, resultados normalizados num tipo único
+- [ ] Edge Function `title` — detalhe de filme
+- [ ] Edge Function `title` — série com temporadas e episódios completos
+- [ ] Cache em `titles`, `seasons`, `episodes` com TTL diferenciado (séries em emissão revalidam mais)
+- [ ] `pt-PT` com fallback para `en-US` quando sinopse ou título vêm vazios
+- [ ] Apenas `poster_path` guardado; URL composto no cliente a partir de tamanhos permitidos
+- [ ] Rate limiting com backoff exponencial e jitter
+- [ ] Deduplicação de pedidos em curso para o mesmo recurso
+- [ ] Erros tipados; nenhum erro cru do TMDB chega ao cliente
+- [ ] Temporada 0 (especiais) tratada explicitamente
+- [ ] Testes com respostas gravadas; nenhuma chamada real no CI
+
+**Aceitação:** zero chamadas ao TMDB a partir do cliente. Chave ausente do bundle, verificado.
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Fase 3 — Motor de ranking
+
+Responsável: `ranking-engineer`
+
+- [ ] Selecção de balde: Adorei / Gostei / Nah
+- [ ] Inserção binária dentro do balde
+- [ ] Máximo rígido de 5 comparações por título
+- [ ] Opção "não sei" que aborta e insere no ponto médio corrente
+- [ ] Primeiro título de um balde não gera comparação
+- [ ] Três âmbitos independentes: filmes, séries, episódios por série
+- [ ] Derivação da nota: Nah 0.0–4.9, Gostei 5.0–7.9, Adorei 8.0–10.0
+- [ ] Comportamento definido e documentado para baldes com menos de 5 títulos
+- [ ] Reordenação manual soberana sobre o algoritmo
+- [ ] Reavaliação reinicia o fluxo para o título
+- [ ] Mudança de balde numa reavaliação move o título entre intervalos sem corromper posições
+- [ ] Taste match com sobreposição mínima antes de mostrar percentagem
+- [ ] Testes de propriedades: ordem final consistente com todas as comparações respondidas
+- [ ] Fuzz com 1000 inserções: nunca mais de 5 comparações, ranking nunca corrompido
+- [ ] Zero dependências de React, rede ou Supabase neste módulo
+
+**Aceitação:** avaliar 30 títulos reais à mão sem irritação. Se cansar, o algoritmo muda antes de a fase fechar.
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Fase 4 — Social, confiança e segurança
+
+Responsáveis: `mobile-engineer` + `trust-safety-engineer` · Veto: `rls-adversary`
+
+### Grafo
+
+- [ ] Registo com conta privada por omissão
+- [ ] Seguir, deixar de seguir
+- [ ] Pedido pendente para perfis privados, com aceitar e recusar
+- [ ] Convite por deep link
+- [ ] Adicionar por contactos, com consentimento explícito e sem enviar a lista para o servidor em claro
+- [ ] Círculo: adicionar, remover, reciprocidade obrigatória, limite de 30 com mensagem clara ao atingir
+
+### Confiança e segurança
+
+- [ ] Bloquear, com efeito bidireccional e imediato
+- [ ] Lista escrita de todas as superfícies onde aparece conteúdo de terceiros, com um teste de bloqueio por cada
+- [ ] Denunciar perfil, resposta e nota, com motivos concretos
+- [ ] Estado da denúncia visível para quem denuncia
+- [ ] Fila de moderação com acções: ignorar, remover, suspender
+- [ ] Registo de auditoria imutável das acções de moderação
+- [ ] Filtro de abuso em handles e respostas, pt e en
+- [ ] Forma de contactar o programador dentro da app
+
+**Aceitação:** requisitos da Guideline 1.2 da App Store cumpridos e demonstrados. `rls-adversary` volta a correr a bateria de bloqueio.
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Fase 5 — Feed e reveal
+
+Responsáveis: `mobile-engineer` + `design-system-keeper`
+
+- [ ] Tokens e componentes primitivos derivados da direção visual aprovada
+- [ ] Feed cronológico do Círculo, com fim — sem scroll infinito
+- [ ] Estado por revelar e transição de reveal
+- [ ] Detalhe do título: notas ordenadas por distância à minha
+- [ ] Detalhe da série: grelha de temporadas e gráfico por episódio, com episódios não vistos ocultos
+- [ ] Perfil: top 4, ranking pessoal, taste match, com as três vistas (estranho, seguidor, Círculo)
+- [ ] Ranking pessoal arrastável
+- [ ] Reacções
+- [ ] Respostas de 140 caracteres, só Círculo
+- [ ] Offline: avaliar em modo avião, fechar, reabrir, sincronizar sem perdas nem duplicações
+- [ ] Resolução determinista de conflito com avaliação feita noutro dispositivo
+- [ ] Optimistic updates com rollback visível em avaliar, reagir e seguir
+- [ ] Estados vazio, a carregar, erro e offline em todos os ecrãs
+- [ ] Pré-carregamento dos posters da comparação seguinte
+- [ ] i18n pt-PT e en, sem strings literais
+- [ ] Acessibilidade: alvos de 44pt, labels, texto grande
+- [ ] Nenhuma contagem de seguidores visível
+
+**Aceitação:** dois telemóveis reais lado a lado, o fluxo completo de nota cega funciona sem hesitações.
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Fase 6 — Notificações
+
+Responsável: `notifications-engineer`
+
+- [ ] Fan-out de discordância em Edge Function, com fila e retry
+- [ ] Limiar de distância configurável
+- [ ] Só dentro do Círculo
+- [ ] Nunca revelar nota de um título que o destinatário ainda não avaliou
+- [ ] Nunca notificar alterações de décimas por reajuste do ranking
+- [ ] Agrupamento: várias discordâncias no mesmo dia são uma notificação
+- [ ] Limite diário por utilizador, conservador por omissão
+- [ ] Janela de silêncio no fuso do dispositivo, nunca entre as 22h e as 8h
+- [ ] Deduplicação idempotente — reprocessar a fila não reenvia
+- [ ] Bloqueio ou saída do Círculo cancelam notificações enfileiradas
+- [ ] Cada notificação abre num destino concreto por deep link
+- [ ] Resumo semanal: o que o Círculo viu, maior discórdia da semana
+- [ ] Definições de notificação por tipo
+- [ ] Teste de carga: Círculo de 30 a avaliar o mesmo título em simultâneo
+
+**Aceitação:** um dia inteiro de uso real não produz uma única notificação que apeteça desligar.
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Fase 7 — Partilha e onboarding
+
+Responsáveis: `tmdb-integrator` + `mobile-engineer` + `design-system-keeper`
+
+- [ ] Geração de cartão 1080x1920 no servidor com satori e resvg
+- [ ] Variantes: ranking pessoal, discordância da semana, nota individual
+- [ ] Partilha para Stories e WhatsApp com deep link de volta
+- [ ] Import de CSV do Letterboxd: mapeamento para TMDB, datas em formatos variados, duplicados
+- [ ] Títulos não encontrados apresentados ao utilizador para resolução manual
+- [ ] Ficheiro corrompido ou parcial nunca importa em silêncio
+- [ ] Onboarding: top 4 favoritos antes de chegar ao feed, para o perfil não nascer vazio
+- [ ] Ecrã de convite com pré-visualização do que o convidado vai ver
+
+**Aceitação:** um utilizador novo com import feito tem perfil apresentável em menos de 3 minutos.
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Antes de submeter às lojas
+
+Responsável: `tech-lead`
+
+- [ ] `rls-adversary` corrido de novo contra produção com contas de teste
+- [ ] `qa` com a bateria completa de fluxos multi-utilizador
+- [ ] Política de privacidade e termos publicados e ligados na app
+- [ ] Etiquetas de privacidade da App Store preenchidas com verdade
+- [ ] Eliminação de conta acessível dentro da app — requisito da Apple
+- [ ] Crash reporting e observabilidade das Edge Functions
+- [ ] Plano de resposta a incidente de dados escrito
+
+Fechada por `tech-lead`: [ ]
+
+---
+
+## Registo de decisões em aberto
+
+Acrescenta aqui em vez de decidir sozinho.
+
+- [ ] Feed limitado ao Círculo ou duas tabs (Círculo e A seguir)?
+- [ ] Nome definitivo da app
+- [ ] Notas de episódio sempre restritas ao Círculo, mesmo em perfil público?
+- [ ] Estratégia de arranque: teste com 10 pessoas em WhatsApp antes de construir

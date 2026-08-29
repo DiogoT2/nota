@@ -1,0 +1,8 @@
+# LF em todo o repositório, independentemente do sistema de quem committa.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ttf binary
+*.otf binary
+package-lock.json -diff linguist-generated

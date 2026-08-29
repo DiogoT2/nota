@@ -1,0 +1,35 @@
+# dependências
+node_modules/
+
+# expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.orig.*
+.expo-shared/
+
+# nativo
+ios/
+android/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# segredos — nunca commitados, ver docs/segredos.md
+.env
+.env.*
+!.env.example
+
+# supabase local
+supabase/.branches/
+supabase/.temp/
+
+# ferramentas
+*.log
+.DS_Store
+coverage/
+.vscode/
+.idea/

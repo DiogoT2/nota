@@ -8,8 +8,15 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0A0806",
     "plugins": ["expo-router", "expo-font"],
-    "experiments": { "typedRoutes": true },
-    "ios": { "supportsTablet": false },
-    "android": { "edgeToEdgeEnabled": true }
+    "experiments": {
+      "typedRoutes": true
+    },
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "edgeToEdgeEnabled": true
+    },
+    "platforms": ["ios", "android"]
   }
 }

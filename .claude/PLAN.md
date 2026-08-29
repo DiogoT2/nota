@@ -25,7 +25,7 @@ Documento de trabalho partilhado. Cada agente marca as suas próprias caixas ao 
 Responsável: `tech-lead`
 
 - [x] Repositório criado, TypeScript em modo estrito, lint e formatação a correr em pre-commit
-- [ ] Projeto Expo a arrancar em iOS e Android
+- [x] Projeto Expo a arrancar em iOS e Android
 - [x] Projeto Supabase local com `supabase start` e seed reproduzível
 - [x] CI: lint, typecheck, testes unitários, testes pgTAP
 - [x] Segredos em `.env` local e no CI; `.env` no gitignore; verificação automática de que nada sensível entra no bundle
@@ -111,9 +111,9 @@ Responsável: `tmdb-integrator`
 - [x] Temporada 0 (especiais) tratada explicitamente
 - [x] Testes com respostas gravadas; nenhuma chamada real no CI
 
-**Aceitação:** zero chamadas ao TMDB a partir do cliente. Chave ausente do bundle, verificado.
+**Aceitação:** zero chamadas ao TMDB a partir do cliente. Chave ausente do bundle, verificado — `npm run check:secrets` exporta o bundle a sério e o scanner foi validado ao contrário, com um canário plantado que ele apanhou nos dois bundles Hermes.
 
-Fechada por `tech-lead`: [ ]
+Fechada por `tech-lead`: [x]
 
 ---
 

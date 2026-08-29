@@ -44,10 +44,18 @@ function ficheiros(dir) {
 function exportar() {
   if (existsSync(OUT)) rmSync(OUT, { recursive: true, force: true });
   process.stdout.write('a exportar o bundle…\n');
-  execFileSync('npx', ['expo', 'export', '--platform', 'all', '--output-dir', OUT], {
-    stdio: 'inherit',
-    shell: process.platform === 'win32',
-  });
+  try {
+    execFileSync('npx', ['expo', 'export', '--platform', 'all', '--output-dir', OUT], {
+      stdio: 'inherit',
+      shell: process.platform === 'win32',
+    });
+  } catch {
+    // O erro do bundler já foi impresso acima por `stdio: inherit`. Deixar o
+    // Node despejar aqui a sua stack por cima só afasta a mensagem que
+    // interessa do fim do output, que é onde se olha primeiro.
+    process.stderr.write('\nO bundle não foi produzido. O erro do Metro está acima.\n');
+    process.exit(1);
+  }
 }
 
 function main() {

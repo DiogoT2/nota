@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "android": "expo start --android",
+    "avaliar": "node --experimental-strip-types --no-warnings scripts/avaliar.mjs",
     "check:definer": "node scripts/check-security-definer.mjs",
     "check:derivacao": "node --experimental-strip-types --no-warnings scripts/check-derivacao.mjs",
     "check:env": "node scripts/check-env.mjs",

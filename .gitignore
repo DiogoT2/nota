@@ -33,3 +33,6 @@ supabase/.temp/
 coverage/
 .vscode/
 .idea/
+
+# relatório da aceitação da Fase 3, local
+.aceitacao.json

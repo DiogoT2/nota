@@ -6,6 +6,7 @@
   "scripts": {
     "android": "expo start --android",
     "check:definer": "node scripts/check-security-definer.mjs",
+    "check:derivacao": "node --experimental-strip-types --no-warnings scripts/check-derivacao.mjs",
     "check:env": "node scripts/check-env.mjs",
     "check:indices": "node scripts/check-indices.mjs",
     "check:login": "node scripts/check-login.mjs",

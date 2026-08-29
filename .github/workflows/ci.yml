@@ -96,3 +96,9 @@ jobs:
       # sobre a causa — e só se descobre tentando.
       - name: as contas de teste fazem login
         run: npm run check:login
+      # A derivação da nota existe em SQL (a vista scores) e em TypeScript (o
+      # motor). Duas implementações da mesma regra divergem — e a divergência
+      # seria invisível, porque as duas devolvem números plausíveis. Este teste
+      # apanhou uma na primeira vez que correu.
+      - name: a nota em SQL e em TypeScript é a mesma
+        run: npm run check:derivacao

@@ -121,21 +121,21 @@ Fechada por `tech-lead`: [x]
 
 Responsável: `ranking-engineer`
 
-- [ ] Selecção de balde: Adorei / Gostei / Nah
-- [ ] Inserção binária dentro do balde
-- [ ] Máximo rígido de 5 comparações por título
-- [ ] Opção "não sei" que aborta e insere no ponto médio corrente
-- [ ] Primeiro título de um balde não gera comparação
-- [ ] Três âmbitos independentes: filmes, séries, episódios por série
-- [ ] Derivação da nota: Nah 0.0–4.9, Gostei 5.0–7.9, Adorei 8.0–10.0
-- [ ] Comportamento definido e documentado para baldes com menos de 5 títulos
-- [ ] Reordenação manual soberana sobre o algoritmo
-- [ ] Reavaliação reinicia o fluxo para o título
-- [ ] Mudança de balde numa reavaliação move o título entre intervalos sem corromper posições
-- [ ] Taste match com sobreposição mínima antes de mostrar percentagem
-- [ ] Testes de propriedades: ordem final consistente com todas as comparações respondidas
-- [ ] Fuzz com 1000 inserções: nunca mais de 5 comparações, ranking nunca corrompido
-- [ ] Zero dependências de React, rede ou Supabase neste módulo
+- [x] Selecção de balde: Adorei / Gostei / Nah
+- [x] Inserção binária dentro do balde
+- [x] Máximo rígido de 5 comparações por título
+- [x] Opção "não sei" que aborta e insere no ponto médio corrente
+- [x] Primeiro título de um balde não gera comparação
+- [x] Três âmbitos independentes: filmes, séries, episódios por série
+- [x] Derivação da nota: Nah 0.0–4.9, Gostei 5.0–7.9, Adorei 8.0–10.0
+- [x] Comportamento definido e documentado para baldes com menos de 5 títulos
+- [x] Reordenação manual soberana sobre o algoritmo
+- [x] Reavaliação reinicia o fluxo para o título
+- [x] Mudança de balde numa reavaliação move o título entre intervalos sem corromper posições
+- [x] Taste match com sobreposição mínima antes de mostrar percentagem
+- [x] Testes de propriedades: ordem final consistente com todas as comparações respondidas
+- [x] Fuzz com 1000 inserções: nunca mais de 5 comparações, ranking nunca corrompido
+- [x] Zero dependências de React, rede ou Supabase neste módulo
 
 **Aceitação:** avaliar 30 títulos reais à mão sem irritação. Se cansar, o algoritmo muda antes de a fase fechar.
 

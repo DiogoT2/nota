@@ -114,6 +114,11 @@ export const en: Dictionary = {
   placeholder: {
     building: 'Under construction. See docs/plano/fase-0-1.md.',
   },
+  tmdb: {
+    attribution:
+      'This product uses the TMDB API but is not endorsed or certified by TMDB.',
+    dataFrom: 'Film and series data: TMDB',
+  },
   share: {
     rankedBy: '#{{position}} in the ranking of',
   },

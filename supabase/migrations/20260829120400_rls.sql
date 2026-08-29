@@ -136,8 +136,21 @@ create policy profiles_actualizar on public.profiles
 
 -- `circle_count` é o limite de 30 materializado. Se pudesse ser escrito por
 -- quem quer que seja, o limite contornava-se com um PATCH a pôr o contador a
--- zero. Duas defesas, porque uma delas é silenciosa e a outra explica-se:
-revoke update (circle_count) on public.profiles from authenticated;
+-- zero.
+--
+-- Duas defesas. A primeira é uma lista de colunas escrevíveis, e não um revoke
+-- da coluna do contador: `revoke update (circle_count)` NÃO FAZ NADA enquanto o
+-- papel tiver `UPDATE` na tabela, porque o privilégio de tabela implica todas
+-- as colunas. Foi verificado com `has_column_privilege`, que devolvia `true`
+-- depois do revoke.
+--
+-- A lista é também a escolha certa por omissão: uma coluna nova nasce sem
+-- permissão de escrita até alguém a acrescentar aqui de propósito. O contrário
+-- — tirar permissões coluna a coluna — obriga a lembrar-se de cada coluna nova,
+-- e é a que se esquecer que fica exposta.
+revoke update on public.profiles from authenticated;
+grant update (handle, display_name, avatar_path, is_private)
+  on public.profiles to authenticated;
 
 create function public.profiles_proteger_contador()
 returns trigger

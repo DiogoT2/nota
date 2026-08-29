@@ -74,6 +74,20 @@ module.exports = [
     },
   },
   {
+    // Handlers de Edge Functions: Deno, não React Native. As regras de estilo
+    // do cliente não se aplicam, e `Deno` é um global legítimo aqui.
+    files: ['supabase/functions/**/*.ts'],
+    languageOptions: { globals: { Deno: 'readonly' } },
+    rules: {
+      'react-native/no-inline-styles': 'off',
+      'react-native/no-color-literals': 'off',
+      // A proibição de chamar o TMDB continua a valer para o cliente. Aqui é
+      // exactamente onde ele DEVE ser chamado — é este o servidor.
+      'no-restricted-syntax': 'off',
+      'no-console': 'off',
+    },
+  },
+  {
     // Os próprios ficheiros de tradução e de tokens são a excepção — é o sítio
     // onde os literais devem viver. Em mais lado nenhum.
     files: ['src/i18n/**/*.ts', 'src/theme/**/*.ts'],

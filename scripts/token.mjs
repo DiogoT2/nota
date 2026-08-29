@@ -16,6 +16,9 @@ import { createHmac } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { Buffer } from 'node:buffer';
 
+// O segredo do JWT local. Vem do ambiente quando lá estiver; o valor por
+// omissão é o que o `supabase start` usa e está na documentação pública do
+// Supabase. Não funciona contra staging nem produção, e é bom que não funcione.
 const SEGREDO =
   process.env.SUPABASE_JWT_SECRET ??
   'super-secret-jwt-token-with-at-least-32-characters-long';

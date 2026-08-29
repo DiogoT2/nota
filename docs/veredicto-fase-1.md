@@ -24,6 +24,7 @@ parte mais importante deste documento.
 | Escrita e limites                              | `030-escrita.sql`                   | 14        | passa     |
 | Limite de 30 sob concorrência                  | `scripts/ataque-limite-circulo.mjs` | 20 rondas | passa     |
 | PostgREST, de fora                             | `scripts/ataque-postgrest.mjs`      | 26        | passa     |
+| Contas do seed fazem login a sério             | `scripts/check-login.mjs`           | 6         | passa     |
 
 Os pgTAP atacam de dentro da base, com `set role authenticated` e claims
 forjadas. A bateria do PostgREST ataca pela porta por onde a app entra — a
@@ -32,7 +33,7 @@ o PostgREST acrescenta superfície que a RLS sozinha não cobre (contagens,
 embeds, upserts, agregações, e mensagens de erro que distinguem «não existe» de
 «não podes ver»).
 
-## Os quatro bugs que estas baterias encontraram
+## Os cinco bugs que estas baterias encontraram
 
 Nenhum foi encontrado por leitura do SQL. Todos por um teste a falhar.
 
@@ -59,9 +60,31 @@ Nenhum foi encontrado por leitura do SQL. Todos por um teste a falhar.
    ser. Como `invoker`, o trigger nunca via esse lado, e deixava formar Círculo
    com quem me tinha bloqueado.
 
-Os quatro são a mesma família: **um trigger ou predicado que corre com os olhos
-do utilizador não consegue impor uma regra que depende de dados que esse
-utilizador não pode ver.** Está registado no ADR 0003, função a função.
+5. **Uma das duas defesas de `circle_count` não existia.** A migração fazia
+   `revoke update (circle_count) on profiles from authenticated` e o comentário
+   dizia «duas defesas». Só havia uma: **um revoke de coluna não faz nada
+   enquanto o papel tiver `UPDATE` na tabela**, porque o privilégio de tabela
+   implica todas as colunas. `has_column_privilege` devolvia `true` depois do
+   revoke. Substituído por uma lista de colunas escrevíveis — que é também a
+   omissão certa, porque uma coluna nova nasce sem permissão de escrita até
+   alguém a acrescentar de propósito.
+
+   Este foi apanhado por acidente, e vale a pena dizer como: o ataque A14
+   passou a dar falso positivo quando outro script deixou o Círculo da ana
+   vazio, e ao investigar o falso positivo apareceu o bug a sério por baixo. O
+   ataque foi corrigido para montar o seu próprio terreno — um teste que depende
+   da ordem por que corre não é um teste — e o falso positivo mostrou-se ser
+   também um falso negativo: com o contador a 1, o `PATCH` sempre tinha sido
+   travado pelo trigger, e ninguém tinha reparado que a segunda defesa era
+   decorativa.
+
+Os primeiros quatro são a mesma família: **um trigger ou predicado que corre com
+os olhos do utilizador não consegue impor uma regra que depende de dados que
+esse utilizador não pode ver.** Está registado no ADR 0003, função a função.
+
+O quinto é de outra: **uma defesa que não foi verificada não é uma defesa.**
+`has_column_privilege` responde à pergunta em uma linha; não a fazer custou uma
+protecção que existia só no comentário.
 
 ## Provas que exigiram método próprio
 

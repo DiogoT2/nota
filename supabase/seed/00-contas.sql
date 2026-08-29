@@ -19,7 +19,13 @@ insert into auth.users (
   instance_id, id, aud, role, email,
   encrypted_password, email_confirmed_at,
   raw_app_meta_data, raw_user_meta_data,
-  created_at, updated_at
+  created_at, updated_at,
+  -- Estas quatro colunas são nullable no esquema, mas o GoTrue lê-as como
+  -- texto e não como texto-que-pode-ser-nulo. Deixá-las a NULL faz o login
+  -- responder «Database error querying schema», que não diz nada sobre a
+  -- causa. Uma conta de teste que não consegue fazer login a sério não serve
+  -- para testar o que a app faz.
+  confirmation_token, recovery_token, email_change, email_change_token_new
 )
 select
   '00000000-0000-0000-0000-000000000000',
@@ -32,7 +38,8 @@ select
   '{"provider":"email","providers":["email"]}'::jsonb,
   jsonb_build_object('handle', c.handle, 'display_name', c.nome),
   now(),
-  now()
+  now(),
+  '', '', '', ''
 from (values
   ('11111111-1111-1111-1111-111111111111'::uuid, 'ana',   'Ana'),
   ('22222222-2222-2222-2222-222222222222'::uuid, 'bruno', 'Bruno'),

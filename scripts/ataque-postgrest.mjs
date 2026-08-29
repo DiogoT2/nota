@@ -15,14 +15,13 @@
  * ignora a RLS não testa nada.
  */
 import { token } from './token.mjs';
+import { carregar, exigir } from './ambiente.mjs';
 
-const BASE = process.env.SUPABASE_URL ?? 'http://127.0.0.1:54321';
-const ANON =
-  process.env.SUPABASE_ANON_KEY ??
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
-const SERVICE =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ??
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';
+const env = carregar();
+
+const BASE = env.EXPO_PUBLIC_SUPABASE_URL ?? 'http://127.0.0.1:54321';
+const ANON = exigir(env, 'EXPO_PUBLIC_SUPABASE_ANON_KEY');
+const SERVICE = exigir(env, 'SUPABASE_SERVICE_ROLE_KEY');
 
 const U = {
   ana: '11111111-1111-1111-1111-111111111111',
@@ -231,6 +230,29 @@ await ataque('A13', 'pôr-me no Círculo de alguém sem reciprocidade', async ()
 });
 
 await ataque('A14', 'contornar o limite de 30 pondo circle_count a zero', async () => {
+  // O ataque monta o seu próprio terreno em vez de contar com o do seed.
+  //
+  // O contador tem de estar acima de zero para o ataque significar alguma
+  // coisa: pôr a zero um contador que já está a zero não muda nada, e o trigger
+  // deixa passar com razão. Uma versão anterior dependia de a ana ter Círculo,
+  // o que só era verdade consoante a ordem por que os scripts corriam — o
+  // ataque do limite de 30 limpa o Círculo dela no fim, e a partir daí este
+  // dava falso positivo. Um teste que depende de outro não é um teste.
+  await rest('circle_members?on_conflict=owner_id,member_id', {
+    como: 'service',
+    metodo: 'POST',
+    prefer: 'resolution=ignore-duplicates',
+    corpo: { owner_id: U.ana, member_id: U.carla },
+  });
+
+  const antes = await rest(`profiles?select=circle_count&id=eq.${U.ana}`, {
+    como: 'service',
+  });
+  const contadorAntes = antes.corpo?.[0]?.circle_count ?? 0;
+  if (contadorAntes === 0) {
+    return { passou: false, detalhe: 'não consegui montar o terreno do ataque' };
+  }
+
   const r = await rest(`profiles?id=eq.${U.ana}`, {
     como: 'ana',
     metodo: 'PATCH',
@@ -241,8 +263,8 @@ await ataque('A14', 'contornar o limite de 30 pondo circle_count a zero', async 
   });
   const contador = verdade.corpo?.[0]?.circle_count;
   return {
-    passou: r.estado >= 400 && contador === 1,
-    detalhe: `${r.estado} · contador continua ${contador} · ${r.texto.slice(0, 100)}`,
+    passou: r.estado >= 400 && contador === contadorAntes,
+    detalhe: `${r.estado} · contador ${contadorAntes} -> ${contador} · ${r.texto.slice(0, 100)}`,
   };
 });
 

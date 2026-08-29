@@ -8,8 +8,23 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    // O Deno exige a extensão .ts nos imports; as Edge Functions são escritas
+    // como ele as corre, e o tsc verifica-as na mesma.
+    "allowImportingTsExtensions": true,
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["node_modules", "proto", "dist", "supabase/.temp"]
+  "exclude": [
+    "node_modules",
+    "proto",
+    "dist",
+    "supabase/.temp",
+    // Os handlers das Edge Functions são programas Deno: usam `Deno.serve` e
+    // `Deno.env`, que o tsc do projecto não conhece. São casca fina de
+    // propósito (docs/plano/fase-2.md, D2) — tudo o que decide alguma coisa
+    // vive em `_shared/`, que CONTINUA a ser verificado aqui e testado em
+    // Vitest. Se um destes ficheiros crescer ao ponto de precisar de
+    // verificação de tipos, é sinal de que tem lógica a mais.
+    "supabase/functions/*/index.ts"
+  ]
 }

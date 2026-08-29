@@ -116,6 +116,11 @@ export const ptPT = {
   placeholder: {
     building: 'Em construção. Ver docs/plano/fase-0-1.md.',
   },
+  tmdb: {
+    attribution:
+      'Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB.',
+    dataFrom: 'Dados de filmes e séries: TMDB',
+  },
   share: {
     rankedBy: '#{{position}} no ranking de',
   },

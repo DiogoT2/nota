@@ -99,17 +99,17 @@ Fechada por `tech-lead`: [ ]
 
 Responsável: `tmdb-integrator`
 
-- [ ] Edge Function `search` — filmes e séries, resultados normalizados num tipo único
-- [ ] Edge Function `title` — detalhe de filme
-- [ ] Edge Function `title` — série com temporadas e episódios completos
-- [ ] Cache em `titles`, `seasons`, `episodes` com TTL diferenciado (séries em emissão revalidam mais)
-- [ ] `pt-PT` com fallback para `en-US` quando sinopse ou título vêm vazios
-- [ ] Apenas `poster_path` guardado; URL composto no cliente a partir de tamanhos permitidos
-- [ ] Rate limiting com backoff exponencial e jitter
-- [ ] Deduplicação de pedidos em curso para o mesmo recurso
-- [ ] Erros tipados; nenhum erro cru do TMDB chega ao cliente
-- [ ] Temporada 0 (especiais) tratada explicitamente
-- [ ] Testes com respostas gravadas; nenhuma chamada real no CI
+- [x] Edge Function `search` — filmes e séries, resultados normalizados num tipo único
+- [x] Edge Function `title` — detalhe de filme
+- [x] Edge Function `title` — série com temporadas e episódios completos
+- [x] Cache em `titles`, `seasons`, `episodes` com TTL diferenciado (séries em emissão revalidam mais)
+- [x] `pt-PT` com fallback para `en-US` quando sinopse ou título vêm vazios
+- [x] Apenas `poster_path` guardado; URL composto no cliente a partir de tamanhos permitidos
+- [x] Rate limiting com backoff exponencial e jitter
+- [x] Deduplicação de pedidos em curso para o mesmo recurso
+- [x] Erros tipados; nenhum erro cru do TMDB chega ao cliente
+- [x] Temporada 0 (especiais) tratada explicitamente
+- [x] Testes com respostas gravadas; nenhuma chamada real no CI
 
 **Aceitação:** zero chamadas ao TMDB a partir do cliente. Chave ausente do bundle, verificado.
 

@@ -8,6 +8,7 @@
     "check:definer": "node scripts/check-security-definer.mjs",
     "check:env": "node scripts/check-env.mjs",
     "check:indices": "node scripts/check-indices.mjs",
+    "check:login": "node scripts/check-login.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "db:ataque": "node scripts/ataque-limite-circulo.mjs",
     "db:ataque:rest": "node scripts/ataque-postgrest.mjs",
@@ -59,6 +60,7 @@
     "lint-staged": "^16.4.0",
     "pg": "^8.23.0",
     "prettier": "^3.9.6",
+    "sharp": "^0.35.4",
     "supabase": "^2.116.0",
     "typescript": "~5.9.2",
     "vitest": "^3.2.4"

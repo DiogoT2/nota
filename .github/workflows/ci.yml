@@ -90,3 +90,9 @@ jobs:
       # embeds, upserts, agregações e mensagens de erro distintas.
       - name: bateria de ataque ao PostgREST
         run: npm run db:ataque:rest
+      # As contas do seed têm de conseguir fazer login a sério, e não só servir
+      # para forjar JWT. Quatro colunas de token a NULL em auth.users fazem o
+      # GoTrue responder «Database error querying schema», que não diz nada
+      # sobre a causa — e só se descobre tentando.
+      - name: as contas de teste fazem login
+        run: npm run check:login

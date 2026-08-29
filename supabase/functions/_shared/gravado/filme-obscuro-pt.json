@@ -1,0 +1,67 @@
+{
+  "adult": false,
+  "backdrop_path": "/ot2LoRyfp73Mswc9Y5KrDJYcyU1.jpg",
+  "belongs_to_collection": {
+    "id": 1119879,
+    "name": "The Ice Road - Colecção",
+    "poster_path": "/jhP97IsbqmT3yoBqZoHbVLoafBI.jpg",
+    "backdrop_path": "/gtIvGzCinBaojazTQKSnzwwDTTY.jpg"
+  },
+  "budget": 0,
+  "genres": [
+    { "id": 28, "name": "Ação" },
+    { "id": 53, "name": "Thriller" },
+    { "id": 18, "name": "Drama" }
+  ],
+  "homepage": "",
+  "id": 1119878,
+  "imdb_id": "tt27621210",
+  "origin_country": ["NP", "US", "AU"],
+  "original_language": "en",
+  "original_title": "Ice Road: Vengeance",
+  "overview": "Mike viaja para o Nepal para espalhar as cinzas do seu falecido irmão no Monte Evereste. Quando Mike e o seu guia de montanha encontram mercenários num autocarro de turismo, são forçados a lutar para se salvarem a si próprios, aos passageiros e à terra natal dos aldeões locais.",
+  "popularity": 18.5874,
+  "poster_path": "/sPTeizmI8p40oEuvbIc2B3H5mg6.jpg",
+  "production_companies": [
+    {
+      "id": 14589,
+      "logo_path": "/5WrEKsyGdTfT3T075EukSoIuxSU.png",
+      "name": "Code Entertainment",
+      "origin_country": "US"
+    },
+    {
+      "id": 33603,
+      "logo_path": "/K1SdQd49Kx3QRx0djfHbzeotCz.png",
+      "name": "Shivhans Pictures",
+      "origin_country": "US"
+    },
+    {
+      "id": 19456,
+      "logo_path": "/d6rHHbJPFkDlULQsvxYgRh9McvN.png",
+      "name": "Envision Media Arts",
+      "origin_country": "US"
+    },
+    {
+      "id": 33768,
+      "logo_path": "/f8TDXTNoj4G4eRCKlUpG3KYQj9I.png",
+      "name": "The Solution",
+      "origin_country": "US"
+    }
+  ],
+  "production_countries": [{ "iso_3166_1": "US", "name": "United States of America" }],
+  "release_date": "2025-06-27",
+  "revenue": 0,
+  "runtime": 113,
+  "softcore": false,
+  "spoken_languages": [
+    { "english_name": "Hindi", "iso_639_1": "hi", "name": "हिन्दी" },
+    { "english_name": "French", "iso_639_1": "fr", "name": "Français" },
+    { "english_name": "English", "iso_639_1": "en", "name": "English" }
+  ],
+  "status": "Released",
+  "tagline": "",
+  "title": "Ice Road: Vengeance",
+  "video": false,
+  "vote_average": 6.3,
+  "vote_count": 659
+}

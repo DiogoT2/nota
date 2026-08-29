@@ -9,6 +9,7 @@
     "check:indices": "node scripts/check-indices.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "db:ataque": "node scripts/ataque-limite-circulo.mjs",
+    "db:ataque:rest": "node scripts/ataque-postgrest.mjs",
     "db:diff": "supabase db diff",
     "db:reset": "node scripts/db-guard.mjs && supabase db reset",
     "db:start": "supabase start",
@@ -22,6 +23,7 @@
     "proto": "cross-env NOTA_PROTO=1 EXPO_ROUTER_APP_ROOT=./proto/app expo start --clear",
     "start": "expo start",
     "test": "vitest run",
+    "token": "node scripts/token.mjs",
     "typecheck": "tsc --noEmit",
     "typecheck:proto": "tsc --noEmit -p proto/tsconfig.json"
   },

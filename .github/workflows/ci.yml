@@ -85,3 +85,8 @@ jobs:
       # sessão só: abre duas ligações a sério e corre a corrida 20 vezes.
       - name: o limite de 30 resiste a escritas em simultâneo
         run: npm run db:ataque
+      # A bateria de fora, pela porta por onde a app entra. Cobre a superfície
+      # que o PostgREST acrescenta e que a RLS sozinha não vê: contagens,
+      # embeds, upserts, agregações e mensagens de erro distintas.
+      - name: bateria de ataque ao PostgREST
+        run: npm run db:ataque:rest

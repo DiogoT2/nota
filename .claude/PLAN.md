@@ -75,19 +75,19 @@ Responsável: `db-architect` · Veto: `rls-adversary`
 Responsável: `rls-adversary`
 
 - [x] Ler bucket ou posição alheia sem ter avaliado
-- [~] Inferir nota alheia por `count=exact`, ordenação ou mensagens de erro distintas
+- [x] Inferir nota alheia por `count=exact`, ordenação ou mensagens de erro distintas
 - [x] Avaliar, ler o alvo, apagar a avaliação, voltar a ler
 - [x] Ler perfil privado com follow em `pending`
-- [~] Ler perfil privado por tabela de junção (reactions, replies, taste_match)
+- [x] Ler perfil privado por tabela de junção (reactions, replies, taste_match)
 - [x] Ler notas de episódio fora do Círculo
 - [x] Ler notas de episódio de um episódio não visto
 - [x] Auto-inserção em `circle_members` sem reciprocidade
 - [x] Ultrapassar o limite de 30 com duas escritas em simultâneo
-- [~] Depois de bloqueado: feed, pesquisa, perfil, respostas antigas, taste match
+- [x] Depois de bloqueado: feed, pesquisa, perfil, respostas antigas, taste match
 - [x] Escrever em nome de outro `user_id`
 - [x] Responder a conteúdo fora do Círculo
 - [x] Exceder 140 caracteres por chamada directa
-- [~] Relatório escrito com veredicto global
+- [x] Relatório escrito com veredicto global
 
 **Aceitação:** todos os ataques falham. Uma única falha bloqueia a fase.
 

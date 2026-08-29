@@ -151,18 +151,35 @@ function cabecalho(feitos, total, decorrido) {
   );
 }
 
-function mostrarRanking(ambito) {
+function mostrarRanking(ambito, destaque = null) {
   const lista = notas(ambito).sort((a, b) => a.posicao - b.posicao);
   if (lista.length === 0) return;
+
+  const JANELA = 12;
+  const iDestaque = lista.findIndex((n) => n.subjectId === destaque);
+  const visiveis = lista.slice(0, JANELA);
+  // O acabado de avaliar tem de aparecer sempre: é a resposta ao esforço que
+  // se acabou de fazer. Se caiu fora do topo, mostra-se à parte.
+  const foraDoTopo = iDestaque >= JANELA ? lista[iDestaque] : null;
+
   stdout.write(c('  o teu ranking\n', 'apagado'));
-  for (const n of lista.slice(0, 12)) {
+  for (const n of visiveis) {
     const nome = titulos.get(n.subjectId) ?? n.subjectId;
-    stdout.write(
-      `  ${c(n.nota.toFixed(1).padStart(4), 'brasa')}  ${c(nome, 'medio')}` +
-        `${n.pregado ? c('  ·pregado', 'apagado') : ''}\n`,
-    );
+    const novo = n.subjectId === destaque;
+    const marca = novo ? c('▸', 'brasa') : ' ';
+    const nota = c(n.nota.toFixed(1).padStart(4), 'brasa');
+    const pregado = n.pregado ? c('  ·pregado', 'apagado') : '';
+    stdout.write(`  ${marca} ${nota}  ${c(nome, novo ? 'claro' : 'medio')}${pregado}\n`);
   }
-  if (lista.length > 12) stdout.write(c(`  … e mais ${lista.length - 12}\n`, 'apagado'));
+  if (foraDoTopo !== null) {
+    const nota = c(foraDoTopo.nota.toFixed(1).padStart(4), 'brasa');
+    const nome = c(titulos.get(foraDoTopo.subjectId) ?? '', 'claro');
+    stdout.write(c('  ···\n', 'apagado'));
+    const posicao = c(`   #${iDestaque + 1}`, 'apagado');
+    stdout.write(`  ${c('▸', 'brasa')} ${nota}  ${nome}${posicao}\n`);
+  } else if (lista.length > JANELA) {
+    stdout.write(c(`  … e mais ${lista.length - JANELA}\n`, 'apagado'));
+  }
   stdout.write('\n');
 }
 
@@ -176,6 +193,7 @@ async function main() {
   let ambito = [];
   let feitos = 0;
   let indice = 0;
+  let ultimo = null;
   const inicio = Date.now();
 
   while (feitos < ALVO && indice < pool.length) {
@@ -185,7 +203,7 @@ async function main() {
 
     limpar();
     cabecalho(feitos, ALVO, Date.now() - inicio);
-    mostrarRanking(ambito);
+    mostrarRanking(ambito, ultimo);
 
     stdout.write(`  ${c(filme.titulo, 'claro')} ${c(`(${filme.ano})`, 'fraco')}\n\n`);
     stdout.write(
@@ -236,6 +254,7 @@ async function main() {
 
     ambito = passo.ambito;
     feitos += 1;
+    ultimo = filme.id;
 
     const nota = notas(ambito).find((n) => n.subjectId === filme.id);
     registo.push({
@@ -250,18 +269,11 @@ async function main() {
       renumerou: passo.renumerou,
     });
 
-    // Confirmação curta: ver a nota é a recompensa do esforço.
-    limpar();
-    cabecalho(feitos, ALVO, Date.now() - inicio);
-    stdout.write(
-      `  ${c(filme.titulo, 'claro')}\n\n` +
-        `  ${c((nota?.nota ?? 0).toFixed(1), 'brasa')}   ` +
-        `${c(NOME_BALDE[balde], 'fraco')}   ` +
-        `${c(`${passo.comparacoes} comparação${passo.comparacoes === 1 ? '' : 'ões'}`, 'apagado')}\n\n`,
-    );
-    mostrarRanking(ambito);
-    stdout.write(c('  qualquer tecla para continuar\n', 'apagado'));
-    await tecla('abcdefghijklmnopqrstuvwxyz0123456789 \r\n?'.split(''));
+    // Sem ecrã de confirmação. A primeira versão tinha um «qualquer tecla para
+    // continuar» a seguir a cada filme, e a medição mostrou que 71% do tempo da
+    // sessão era gasto ali — a fricção que eu acrescentei dominava aquilo que a
+    // fase existe para medir. A nota aparece no ranking do ecrã seguinte, com
+    // uma marca: mesma recompensa, zero teclas.
   }
 
   relatorio(ambito, Date.now() - inicio);

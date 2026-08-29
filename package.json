@@ -6,6 +6,7 @@
   "scripts": {
     "android": "expo start --android",
     "check:definer": "node scripts/check-security-definer.mjs",
+    "check:env": "node scripts/check-env.mjs",
     "check:indices": "node scripts/check-indices.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "db:ataque": "node scripts/ataque-limite-circulo.mjs",

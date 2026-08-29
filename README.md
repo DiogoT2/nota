@@ -11,6 +11,7 @@ Precisas de Node 22, Docker a correr e um clone limpo.
 npm install        # instala e prepara o hook de pre-commit
 npm run db:start   # Postgres, PostgREST, Auth e Studio em Docker
 cp .env.example .env
+npm run check:env  # confirma que as credenciais respondem
 npm start          # Expo
 ```
 

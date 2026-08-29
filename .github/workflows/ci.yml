@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Zero chamadas reais ao TMDB. Se um teste precisar de metadados, usa fixture.
+env:
+  NOTA_ENV: ci
+  TMDB_API_KEY: ''
+
+jobs:
+  cliente:
+    name: Cliente — lint, tipos, testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run format:check
+
+  bundle:
+    name: Segredos — nenhum no bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Valores falsos mas reais em forma: se algum deles sair no bundle, o
+      # script apanha-o. Verificar só os padrões não provaria nada.
+      - name: check:secrets
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ci-service-role-canario
+          TMDB_API_KEY: ci000000tmdb000000canario00000000
+          TMDB_READ_ACCESS_TOKEN: eyJhbGciOiJIUzI1NiJ9.ci-tmdb-token-canario
+        run: npm run check:secrets
+
+  base-de-dados:
+    name: Postgres — migrações, pgTAP, RLS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: supabase start
+        run: supabase start
+      # `db reset` corre as migrações do zero e depois o seed. Uma migração que
+      # só funciona por cima do estado de ontem falha aqui.
+      - name: migrações do zero
+        run: supabase db reset --no-seed
+      - name: seed determinista
+        run: supabase db reset
+      - name: pgTAP
+        run: supabase test db
+      - name: nenhuma alteração por migrar
+        run: |
+          diff=$(supabase db diff --schema public)
+          if [ -n "$diff" ]; then
+            echo "esquema fora das migrações:"; echo "$diff"; exit 1
+          fi
+      # RLS activo em todas as tabelas é um teste pgTAP
+      # (supabase/tests/000-rls-universal.sql), não um script à parte: o teste
+      # interroga pg_class na base a sério, em vez de ler ficheiros.
+      - name: toda a função security definer tem ADR e search_path fixo
+        run: npm run check:definer
+      - name: todo o índice de desempenho é usado por uma query real
+        run: npm run check:indices
+      # O limite de 30 sob concorrência. Não cabe em pgTAP, que corre numa
+      # sessão só: abre duas ligações a sério e corre a corrida 20 vezes.
+      - name: o limite de 30 resiste a escritas em simultâneo
+        run: npm run db:ataque

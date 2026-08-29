@@ -4,17 +4,26 @@
   "main": "expo-router/entry",
   "private": true,
   "scripts": {
-    "start": "expo start",
     "android": "expo start --android",
-    "ios": "expo start --ios",
-    "proto": "cross-env NOTA_PROTO=1 EXPO_ROUTER_APP_ROOT=./proto/app expo start --clear",
-    "typecheck": "tsc --noEmit",
-    "typecheck:proto": "tsc --noEmit -p proto/tsconfig.json",
-    "lint": "eslint .",
+    "check:definer": "node scripts/check-security-definer.mjs",
+    "check:indices": "node scripts/check-indices.mjs",
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "db:ataque": "node scripts/ataque-limite-circulo.mjs",
+    "db:diff": "supabase db diff",
+    "db:reset": "node scripts/db-guard.mjs && supabase db reset",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:test": "supabase test db",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "ios": "expo start --ios",
+    "lint": "eslint .",
+    "prepare": "husky",
+    "proto": "cross-env NOTA_PROTO=1 EXPO_ROUTER_APP_ROOT=./proto/app expo start --clear",
+    "start": "expo start",
     "test": "vitest run",
-    "prepare": "husky"
+    "typecheck": "tsc --noEmit",
+    "typecheck:proto": "tsc --noEmit -p proto/tsconfig.json"
   },
   "dependencies": {
     "@expo-google-fonts/archivo": "^0.2.3",
@@ -34,6 +43,7 @@
     "react-native-screens": "~4.16.0"
   },
   "devDependencies": {
+    "@types/pg": "^8.23.1",
     "@types/react": "~19.1.0",
     "babel-plugin-module-resolver": "^5.0.3",
     "cross-env": "^10.1.0",
@@ -44,7 +54,9 @@
     "eslint-plugin-react-native": "^5.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
+    "pg": "^8.23.0",
     "prettier": "^3.9.6",
+    "supabase": "^2.116.0",
     "typescript": "~5.9.2",
     "vitest": "^3.2.4"
   },

@@ -24,13 +24,13 @@ Documento de trabalho partilhado. Cada agente marca as suas próprias caixas ao 
 
 Responsável: `tech-lead`
 
-- [ ] Repositório criado, TypeScript em modo estrito, lint e formatação a correr em pre-commit
+- [x] Repositório criado, TypeScript em modo estrito, lint e formatação a correr em pre-commit
 - [ ] Projeto Expo a arrancar em iOS e Android
-- [ ] Projeto Supabase local com `supabase start` e seed reproduzível
-- [ ] CI: lint, typecheck, testes unitários, testes pgTAP
-- [ ] Segredos em `.env` local e no CI; `.env` no gitignore; verificação automática de que nada sensível entra no bundle
-- [ ] `docs/adr/0001-stack.md` escrito
-- [ ] Ambientes separados: local, staging, produção
+- [x] Projeto Supabase local com `supabase start` e seed reproduzível
+- [x] CI: lint, typecheck, testes unitários, testes pgTAP
+- [x] Segredos em `.env` local e no CI; `.env` no gitignore; verificação automática de que nada sensível entra no bundle
+- [x] `docs/adr/0001-stack.md` escrito
+- [~] Ambientes separados: local, staging, produção
 
 **Aceitação:** um programador novo clona, corre um comando e tem tudo a funcionar.
 
@@ -44,50 +44,50 @@ Responsável: `db-architect` · Veto: `rls-adversary`
 
 ### Esquema
 
-- [ ] `profiles` com `is_private` a `true` por omissão
-- [ ] `follows` com estado `pending | active`
-- [ ] `circle_members` com trigger que garante reciprocidade
-- [ ] Limite de 30 no Círculo imposto por constraint ou trigger, à prova de escrita concorrente
-- [ ] `blocks`
-- [ ] `reports`
-- [ ] `titles`, `seasons`, `episodes` (cache TMDB)
-- [ ] `buckets`
-- [ ] `rank_positions` com unicidade por `(user_id, subject_type, scope_id)` e numeração esparsa ou fraccionária
-- [ ] `watched`
-- [ ] `reactions`, `replies` com limite de 140 caracteres em constraint
-- [ ] `taste_match`
-- [ ] Nota derivada exposta por vista ou função — nenhuma coluna de nota no caminho de escrita
-- [ ] Índices para: feed do Círculo, ranking por âmbito, pesquisa de handle
-- [ ] Todas as migrações reversíveis
+- [x] `profiles` com `is_private` a `true` por omissão
+- [x] `follows` com estado `pending | active`
+- [x] `circle_members` com trigger que garante reciprocidade
+- [x] Limite de 30 no Círculo imposto por constraint ou trigger, à prova de escrita concorrente
+- [x] `blocks`
+- [x] `reports`
+- [x] `titles`, `seasons`, `episodes` (cache TMDB)
+- [x] `buckets`
+- [x] `rank_positions` com unicidade por `(user_id, subject_type, scope_id)` e numeração esparsa ou fraccionária
+- [x] `watched`
+- [x] `reactions`, `replies` com limite de 140 caracteres em constraint
+- [x] `taste_match`
+- [x] Nota derivada exposta por vista ou função — nenhuma coluna de nota no caminho de escrita
+- [x] Índices para: feed do Círculo, ranking por âmbito, pesquisa de handle
+- [~] Todas as migrações reversíveis
 
 ### RLS
 
-- [ ] RLS activo em todas as tabelas com dados de utilizador, sem excepções
-- [ ] Ler notas de um título exige bucket próprio para esse título
-- [ ] Ler qualquer coisa de perfil privado exige `follows.state = 'active'`
-- [ ] Ler notas de episódio exige Círculo **e** `watched` para esse episódio
-- [ ] Bloqueio anula tudo o acima, nos dois sentidos
-- [ ] Escrita restrita ao próprio `user_id` em todas as tabelas
-- [ ] Cada `security definer` justificado num ADR
+- [x] RLS activo em todas as tabelas com dados de utilizador, sem excepções
+- [x] Ler notas de um título exige bucket próprio para esse título
+- [x] Ler qualquer coisa de perfil privado exige `follows.state = 'active'`
+- [x] Ler notas de episódio exige Círculo **e** `watched` para esse episódio
+- [x] Bloqueio anula tudo o acima, nos dois sentidos
+- [x] Escrita restrita ao próprio `user_id` em todas as tabelas
+- [x] Cada `security definer` justificado num ADR
 
 ### Ataque
 
 Responsável: `rls-adversary`
 
-- [ ] Ler bucket ou posição alheia sem ter avaliado
-- [ ] Inferir nota alheia por `count=exact`, ordenação ou mensagens de erro distintas
-- [ ] Avaliar, ler o alvo, apagar a avaliação, voltar a ler
-- [ ] Ler perfil privado com follow em `pending`
-- [ ] Ler perfil privado por tabela de junção (reactions, replies, taste_match)
-- [ ] Ler notas de episódio fora do Círculo
-- [ ] Ler notas de episódio de um episódio não visto
-- [ ] Auto-inserção em `circle_members` sem reciprocidade
-- [ ] Ultrapassar o limite de 30 com duas escritas em simultâneo
-- [ ] Depois de bloqueado: feed, pesquisa, perfil, respostas antigas, taste match
-- [ ] Escrever em nome de outro `user_id`
-- [ ] Responder a conteúdo fora do Círculo
-- [ ] Exceder 140 caracteres por chamada directa
-- [ ] Relatório escrito com veredicto global
+- [x] Ler bucket ou posição alheia sem ter avaliado
+- [~] Inferir nota alheia por `count=exact`, ordenação ou mensagens de erro distintas
+- [x] Avaliar, ler o alvo, apagar a avaliação, voltar a ler
+- [x] Ler perfil privado com follow em `pending`
+- [~] Ler perfil privado por tabela de junção (reactions, replies, taste_match)
+- [x] Ler notas de episódio fora do Círculo
+- [x] Ler notas de episódio de um episódio não visto
+- [x] Auto-inserção em `circle_members` sem reciprocidade
+- [x] Ultrapassar o limite de 30 com duas escritas em simultâneo
+- [~] Depois de bloqueado: feed, pesquisa, perfil, respostas antigas, taste match
+- [x] Escrever em nome de outro `user_id`
+- [x] Responder a conteúdo fora do Círculo
+- [x] Exceder 140 caracteres por chamada directa
+- [~] Relatório escrito com veredicto global
 
 **Aceitação:** todos os ataques falham. Uma única falha bloqueia a fase.
 

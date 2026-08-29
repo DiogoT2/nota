@@ -1,65 +1,52 @@
-# Equipa de agentes — Nota
+# Nota
 
-Agentes para Claude Code do projeto "Nota" (app social de notas de filmes, séries e episódios).
+App social onde amigos partilham notas de filmes, séries e episódios.
+As regras de produto estão em `.claude/CLAUDE.md` e não são negociáveis.
 
-## Instalação
+## Arrancar
 
-Copia a pasta `.claude` para a raiz do teu repositório:
+Precisas de Node 22, Docker a correr e um clone limpo.
 
-```
-o-teu-projeto/
-├── .claude/
-│   ├── agents/
-│   └── CLAUDE.md
-└── ...
-```
-
-Depois abre o Claude Code na raiz e confirma com `/agents`.
-
-Para os teres disponíveis em todos os projetos, copia antes para `~/.claude/agents/`.
-
-## Agentes
-
-| Agente                   | Quando usar                                                                         |
-| ------------------------ | ----------------------------------------------------------------------------------- |
-| `tech-lead`              | Início de cada fase, decisões de arquitetura, fecho de fase                         |
-| `db-architect`           | Qualquer alteração de esquema, migrações, RLS. Dono único de `supabase/migrations/` |
-| `rls-adversary`          | Antes de fechar qualquer fase. Tem poder de veto                                    |
-| `tmdb-integrator`        | Tudo o que toque em metadados do TMDB                                               |
-| `ranking-engineer`       | Comparações, derivação de nota, taste match                                         |
-| `mobile-engineer`        | Ecrãs, navegação, estado, offline                                                   |
-| `design-system-keeper`   | Tokens, componentes, revisão de estilos                                             |
-| `notifications-engineer` | Push, fan-out, resumo semanal                                                       |
-| `trust-safety-engineer`  | Bloquear, denunciar, moderar                                                        |
-| `qa`                     | Fluxos completos multi-utilizador                                                   |
-
-## Ordem de trabalho
-
-Nenhuma UI antes de o `db-architect` fechar o esquema e o `rls-adversary` passar.
-
-## Aplicação
-
-Ecrãs implementados a partir da direcção **1a "Sala Escura"** do Claude Design
-(`Nota.dc.html`, projecto `dcf70d0e`).
-
-```
-npm install
-npm start        # Expo
-npm run typecheck
-npm test         # lógica pura (Vitest)
+```sh
+npm install        # instala e prepara o hook de pre-commit
+npm run db:start   # Postgres, PostgREST, Auth e Studio em Docker
+cp .env.example .env
+npm start          # Expo
 ```
 
-| Rota                      | Ecrã do design                                      |
-| ------------------------- | --------------------------------------------------- |
-| `/`                       | `2a` Feed — só o Círculo, cronológico, com fim      |
-| `/titulo/[id]`            | `2b` Detalhe do título, notas por distância à minha |
-| `/avaliar/balde`          | `2c` Avaliar, passo 1 — o balde                     |
-| `/avaliar/comparar`       | `2d` Avaliar, passo 2 — comparação, 5 rondas        |
-| `/serie/[id]`             | `2e` Detalhe da série, episódio a episódio          |
-| `/perfil/[handle]?visto=` | `2f` Perfil visto por estranho / seguidor / Círculo |
-| `/ranking`                | `2g` Ranking pessoal, arrastável                    |
-| `/partilhar/[id]`         | `2h` Cartão para Stories, 1080×1920                 |
+`npm run db:start` imprime a chave `anon` local. Copia-a para o `.env`.
 
-`src/theme/` é a única fonte de valores visuais e `src/i18n/` a única fonte de
-texto. `src/data/fixtures.ts` é temporário: desaparece quando o esquema e as
-políticas RLS fecharem.
+## Comandos
+
+|                         |                                                       |
+| ----------------------- | ----------------------------------------------------- |
+| `npm start`             | Expo, aplicação real                                  |
+| `npm run proto`         | protótipo de UI em quarentena — ver `proto/README.md` |
+| `npm run lint`          | ESLint, inclui as proibições permanentes              |
+| `npm run typecheck`     | TypeScript estrito                                    |
+| `npm test`              | Vitest, lógica pura                                   |
+| `npm run db:reset`      | recria a base do zero, com seed determinista          |
+| `npm run db:test`       | pgTAP, incluindo os testes de ataque à RLS            |
+| `npm run check:secrets` | exporta o bundle e procura segredos lá dentro         |
+
+## Onde está o quê
+
+```
+app/         ecrãs (mínimos — os reais nascem na Fase 5)
+src/theme/   tokens; nenhum valor de estilo pode viver fora daqui
+src/i18n/    pt-PT e en; nenhuma string literal pode viver fora daqui
+supabase/    migrações, seed e testes pgTAP
+proto/       protótipo de UI em quarentena, não é código do produto
+docs/adr/    decisões de arquitectura
+docs/        plano de fases, esquema, bateria de ataque, ambientes
+```
+
+## Como se trabalha aqui
+
+Fases numeradas, em `.claude/PLAN.md`. Nenhuma avança sem a anterior testada e
+sem veredicto positivo do `rls-adversary`, que ataca a base de dados a partir
+de fora e tem poder de veto.
+
+As três primeiras regras de produto são políticas RLS em Postgres. Nunca lógica
+de cliente. Um ecrã que esconda uma nota que a base devolveria não é uma nota
+cega — é um ecrã bonito por cima de uma fuga.

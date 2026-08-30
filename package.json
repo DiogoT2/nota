@@ -25,6 +25,7 @@
     "lint": "eslint .",
     "prepare": "husky",
     "proto": "cross-env NOTA_PROTO=1 EXPO_ROUTER_APP_ROOT=./proto/app expo start --clear",
+    "simular": "node --experimental-strip-types --no-warnings scripts/simular.mjs",
     "start": "expo start",
     "test": "vitest run",
     "token": "node scripts/token.mjs",

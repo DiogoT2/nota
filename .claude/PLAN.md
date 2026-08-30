@@ -136,8 +136,16 @@ Responsável: `ranking-engineer`
 - [x] Testes de propriedades: ordem final consistente com todas as comparações respondidas
 - [x] Fuzz com 1000 inserções: nunca mais de 5 comparações, ranking nunca corrompido
 - [x] Zero dependências de React, rede ou Supabase neste módulo
+- [x] Simulação de sessões contra o motor: `npm run simular`
 
 **Aceitação:** avaliar 30 títulos reais à mão sem irritação. Se cansar, o algoritmo muda antes de a fase fechar.
+
+Feito em parte: 7 títulos à mão, parados por curiosidade satisfeita e não por
+cansaço, e o resto por simulação — 200 sessões de 30 títulos, mais escala a 100
+e 500. O lado mecânico fecha: o tecto de 5 nunca foi furado e custa 3% de
+fidelidade de ordem a 500 títulos. O lado humano — a fricção de 30 títulos
+seguidos — continua por provar, e nenhuma simulação o prova. Passa para a
+Fase 5, onde o ecrã existe. Relatório em `docs/plano/fase-3-aceitacao.md`.
 
 Fechada por `tech-lead`: [ ]
 

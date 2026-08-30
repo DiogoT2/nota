@@ -1,7 +1,7 @@
 -- Regras 2 e 3 · Visibilidade, Círculo, episódios e bloqueio
 
 begin;
-select plan(22);
+select plan(26);
 
 create function pg_temp.autenticar(quem uuid) returns void
 language plpgsql as $$
@@ -209,6 +209,53 @@ select is_empty(
         ('11111111-1111-1111-1111-111111111111', '55555555-5555-5555-5555-555555555555')
       ) $$,
   'bloquear apagou o follows que existia, nos dois sentidos'
+);
+
+-- Regra 3, o taste match. Nao tinha um unico teste ate agora, e o preco disso
+-- apareceu quando a Fase 3 subiu o minimo de sobreposicao de 5 para 10: a linha
+-- do seed ficou invisivel para toda a gente e dois ataques da bateria passaram
+-- a marcar verde por vacuo. Um teste de que so o Circulo ve nao vale nada
+-- enquanto ninguem verificar que alguem ve.
+
+select pg_temp.autenticar('11111111-1111-1111-1111-111111111111');  -- ana
+
+select isnt_empty(
+  $$ select 1 from public.taste_match
+      where user_a = '11111111-1111-1111-1111-111111111111'
+        and user_b = '33333333-3333-3333-3333-333333333333' $$,
+  'o taste match e legivel dentro do Circulo — sem isto, os testes abaixo passam por vacuo'
+);
+
+select pg_temp.autenticar('66666666-6666-6666-6666-666666666666');  -- fabio
+
+select is_empty(
+  $$ select 1 from public.taste_match $$,
+  'quem nao e do Circulo nao ve taste match nenhum'
+);
+
+-- O limiar e uma regra de produto, nao um detalhe de apresentacao: uma
+-- percentagem que salta dezenas de pontos com um titulo novo e pior do que
+-- nenhuma. Se alguem baixar o `overlap >= 10` da politica, este teste cai.
+select pg_temp.como_postgres();
+update public.taste_match set overlap = 9
+ where user_a = '11111111-1111-1111-1111-111111111111';
+
+select pg_temp.autenticar('11111111-1111-1111-1111-111111111111');  -- ana
+
+select is_empty(
+  $$ select 1 from public.taste_match $$,
+  'abaixo do minimo de sobreposicao a linha desaparece, mesmo para o Circulo'
+);
+
+select pg_temp.como_postgres();
+update public.taste_match set overlap = 12
+ where user_a = '11111111-1111-1111-1111-111111111111';
+
+select pg_temp.autenticar('11111111-1111-1111-1111-111111111111');
+
+select isnt_empty(
+  $$ select 1 from public.taste_match $$,
+  'e volta a aparecer quando a sobreposicao chega ao minimo'
 );
 
 select * from finish();

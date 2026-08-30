@@ -30,7 +30,19 @@ async function q(cliente, sql, params) {
 
 /** Enche o Círculo da ana até `quantos` e devolve os dois candidatos a seguir. */
 async function preparar(admin, quantos) {
-  await q(admin, 'delete from public.circle_members where owner_id = $1', [ANA]);
+  // Apaga só o que esta bateria semeou.
+  //
+  // Apagar tudo o que tinha `owner_id = ana` levava à frente o par ana↔carla do
+  // seed e deixava a base num estado que nenhum `db reset` produz — metade de
+  // um Círculo recíproco. Consequência: cinco testes pgTAP falhavam, mas só se
+  // esta bateria tivesse corrido antes deles. Uma suite cujo resultado depende
+  // da ordem de execução não é uma suite; é um sorteio.
+  const semeados = "select id from auth.users where email like 'corrida%@nota.test'";
+  await q(
+    admin,
+    `delete from public.circle_members
+      where owner_id in (${semeados}) or member_id in (${semeados})`,
+  );
   await q(admin, "delete from auth.users where email like 'corrida%@nota.test'");
 
   const ids = [];
@@ -66,15 +78,26 @@ async function preparar(admin, quantos) {
     );
   }
 
-  // Enche até `quantos`. Sobram dois para a corrida.
-  for (let i = 0; i < quantos; i += 1) {
+  // Enche até `quantos`, contando quem já lá está. O seed dá à ana um membro
+  // de Círculo (a carla), e assumir que o Círculo começa vazio enchia-o até 30
+  // antes da corrida: as duas transacções eram recusadas pelo limite e a
+  // bateria acusava falha por causa do seu próprio setup, não da defesa.
+  const { rows: agora } = await q(
+    admin,
+    'select circle_count from public.profiles where id = $1',
+    [ANA],
+  );
+  const faltam = quantos - agora[0].circle_count;
+
+  for (let i = 0; i < faltam; i += 1) {
     await q(
       admin,
       'insert into public.circle_members (owner_id, member_id) values ($1, $2)',
       [ANA, ids[i]],
     );
   }
-  return [ids[quantos], ids[quantos + 1]];
+  // Sobram dois para a corrida, e nunca são dos que já entraram.
+  return [ids[faltam], ids[faltam + 1]];
 }
 
 /** Uma transacção que tenta entrar no Círculo, com um ponto de encontro. */
@@ -144,7 +167,19 @@ async function main() {
 
   // Limpar o que se semeou, para o próximo `db reset` não ser a única forma de
   // repor a base num estado conhecido.
-  await q(admin, 'delete from public.circle_members where owner_id = $1', [ANA]);
+  // Apaga só o que esta bateria semeou.
+  //
+  // Apagar tudo o que tinha `owner_id = ana` levava à frente o par ana↔carla do
+  // seed e deixava a base num estado que nenhum `db reset` produz — metade de
+  // um Círculo recíproco. Consequência: cinco testes pgTAP falhavam, mas só se
+  // esta bateria tivesse corrido antes deles. Uma suite cujo resultado depende
+  // da ordem de execução não é uma suite; é um sorteio.
+  const semeados = "select id from auth.users where email like 'corrida%@nota.test'";
+  await q(
+    admin,
+    `delete from public.circle_members
+      where owner_id in (${semeados}) or member_id in (${semeados})`,
+  );
   await q(admin, "delete from auth.users where email like 'corrida%@nota.test'");
   await admin.end();
 

@@ -117,5 +117,14 @@ insert into public.reactions (user_id, target_user_id, target_subject_type, targ
 -- ── taste_match ──────────────────────────────────────────────────────────────
 -- Sobreposição acima do mínimo, para que o caminho de leitura seja testável. O
 -- par é canónico: user_a < user_b.
+--
+-- O valor esteve em 6 e a Fase 3 subiu o mínimo de 5 para 10 (decisão D3), o
+-- que tornou esta linha invisível para toda a gente — incluindo para a ana e a
+-- carla, que são Círculo mútuo. O caminho de leitura deixou de ser exercido por
+-- ninguém e dois ataques da bateria passaram a marcar verde por vácuo: davam
+-- zero linhas por causa do limiar, não por causa do bloqueio que diziam testar.
+--
+-- Se o mínimo voltar a subir, este número sobe com ele. É o que o teste
+-- `taste_match` em 020-visibilidade-circulo.sql passa a garantir.
 insert into public.taste_match (user_a, user_b, overlap, affinity, computed_at) values
-  ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 6, 0.812, now());
+  ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 12, 0.812, now());

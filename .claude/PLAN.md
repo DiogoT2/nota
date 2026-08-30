@@ -147,7 +147,9 @@ fidelidade de ordem a 500 títulos. O lado humano — a fricção de 30 títulos
 seguidos — continua por provar, e nenhuma simulação o prova. Passa para a
 Fase 5, onde o ecrã existe. Relatório em `docs/plano/fase-3-aceitacao.md`.
 
-Fechada por `tech-lead`: [ ]
+Fechada por `tech-lead`: [x] — com ressalva: fica por provar a fricção humana de 30 títulos à mão (7 feitos, e nenhum até ao cansaço); o critério exigia um ecrã que a Fase 3 explicitamente não constrói, e a dívida move-se para a Fase 5 na caixa «Fricção de 30 títulos seguidos». Veredicto do `rls-adversary` sobre `20260830090000_ranking.sql`: **positivo**, relatório em `docs/ataque/fase-3.md`. 59/59 pgTAP, 26 ataques sem sucesso, `security_invoker=on` confirmado em `pg_class.reloptions` e não no ficheiro, 11 ataques novos ao `pinned` e 5 ao `taste_match` todos defendidos. A condição está satisfeita e o fecho vale.
+
+Três dívidas do relatório, corrigidas antes de a Fase 4 arrancar: o seed do `taste_match` estava em `overlap = 6` e o limiar novo é 10, o que tornava a linha invisível para toda a gente e fazia dois ataques da bateria marcar verde por vácuo (seed a 12, e quatro testes pgTAP novos, validados ao contrário nos dois sentidos); e `ataque-limite-circulo.mjs` apagava o Círculo do seed sem o repor, o que fazia cinco testes pgTAP falharem consoante a ordem de execução.
 
 ---
 
@@ -155,25 +157,38 @@ Fechada por `tech-lead`: [ ]
 
 Responsáveis: `mobile-engineer` + `trust-safety-engineer` · Veto: `rls-adversary`
 
+Decomposição em `docs/plano/fase-4.md`. As oito decisões bloqueantes D1–D8 foram
+respondidas a 2026-08-30 e estão registadas em `docs/adr/0004-decisoes-fase-4.md`,
+com alternativas rejeitadas e custo assumido. **Nada nesta fase está bloqueado
+por decisões em aberto.**
+
 ### Grafo
 
 - [ ] Registo com conta privada por omissão
 - [ ] Seguir, deixar de seguir
 - [ ] Pedido pendente para perfis privados, com aceitar e recusar
+- [ ] Cooldown de 30 dias após recusa, em `follow_cooldowns`, sem `SELECT` para ninguém (ADR 0004, D3)
 - [ ] Convite por deep link
-- [ ] Adicionar por contactos, com consentimento explícito e sem enviar a lista para o servidor em claro
+- [ ] ~~Adicionar por contactos~~ — **cancelado** por ADR 0004 (D8): fora da v1, a app não pede contactos
 - [ ] Círculo: adicionar, remover, reciprocidade obrigatória, limite de 30 com mensagem clara ao atingir
 
 ### Confiança e segurança
 
-- [ ] Bloquear, com efeito bidireccional e imediato
+- [ ] Bloquear, com efeito bidireccional e imediato, e confirmação que avisa que o Círculo se perde (ADR 0004, D1)
 - [ ] Lista escrita de todas as superfícies onde aparece conteúdo de terceiros, com um teste de bloqueio por cada
+- [ ] Teste que prova que o bloqueio esconde — e não apaga — as respostas já escritas (ADR 0004, D2)
 - [ ] Denunciar perfil, resposta e nota, com motivos concretos
-- [ ] Estado da denúncia visível para quem denuncia
-- [ ] Fila de moderação com acções: ignorar, remover, suspender
-- [ ] Registo de auditoria imutável das acções de moderação
-- [ ] Filtro de abuso em handles e respostas, pt e en
-- [ ] Forma de contactar o programador dentro da app
+- [ ] `reports` identifica sem ambiguidade a nota denunciada (filme, série ou episódio) — lacuna da Fase 1
+- [ ] Máquina de estados de `reports` separa acção sobre conteúdo de acção sobre conta (ADR 0004, D4)
+- [ ] Estado da denúncia visível para quem denuncia: «tratada» + destino do conteúdo, nunca da conta
+- [ ] Fila de moderação com acções: ignorar, remover, suspender — por SQL, com runbook (ADR 0004, D5)
+- [ ] Suspender = perder escrita, manter leitura; `profiles.suspended_until`, com `blocks` e `reports` de fora (ADR 0004, D6)
+- [ ] Registo de auditoria imutável das acções de moderação — imposto, incluindo contra `service_role`
+- [ ] Aviso automático de denúncia aberta há mais de 12 horas (metade do compromisso das 24)
+- [ ] Filtro de abuso: recusa dura em handles, revisão em respostas, pt e en (ADR 0004, D7)
+- [ ] Forma de contactar o programador dentro da app — é também a única via de recurso de suspensão e de handle recusado
+- [ ] Cron de `purgar_retencao()` a correr sobre três tabelas (a função existe desde F1-2, ninguém a chama)
+- [ ] `rls-adversary`, primeiro passe contra a migração de F4-2, antes de qualquer ecrã
 
 **Aceitação:** requisitos da Guideline 1.2 da App Store cumpridos e demonstrados. `rls-adversary` volta a correr a bateria de bloqueio.
 
@@ -202,6 +217,8 @@ Responsáveis: `mobile-engineer` + `design-system-keeper`
 - [ ] i18n pt-PT e en, sem strings literais
 - [ ] Acessibilidade: alvos de 44pt, labels, texto grande
 - [ ] Nenhuma contagem de seguidores visível
+- [ ] **Fricção de 30 títulos seguidos** — dívida herdada da Fase 3, que fechou com esta ressalva. Uma pessoa avalia 30 títulos reais no ecrã de comparação; se cansar, muda o algoritmo, não o ecrã
+- [ ] A nota mostra-se como relativa e não absoluta — a simulação da Fase 3 mediu 27% das notas a mexerem-se a cada título novo aos 30 títulos
 
 **Aceitação:** dois telemóveis reais lado a lado, o fluxo completo de nota cega funciona sem hesitações.
 
@@ -277,3 +294,8 @@ Acrescenta aqui em vez de decidir sozinho.
 - [ ] Nome definitivo da app
 - [ ] Notas de episódio sempre restritas ao Círculo, mesmo em perfil público?
 - [ ] Estratégia de arranque: teste com 10 pessoas em WhatsApp antes de construir
+- [x] **Fase 4, D1–D8** — respondidas a 2026-08-30, registadas em `docs/adr/0004-decisoes-fase-4.md`
+
+### A rever quando disparar o gatilho
+
+- [ ] **Painel de moderação** (ADR 0004, D5). A decisão de moderar por SQL é revista ao **primeiro** destes acontecimentos, sem discussão de circunstâncias: uma denúncia passa das 24 horas; entra o primeiro utilizador fora do círculo de conhecidos directos; ou a fila tem mais de cinco denúncias abertas ao mesmo tempo.
